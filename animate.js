@@ -8,32 +8,44 @@ $(document).ready(function() {
   var text = $('.text');
   text.lettering();
   
-  $('.svgBlur span').each(function(i) {
-    var blurClone = blur.clone();
-    var blurId="blur"+ (i + 1);
-    blurClone.attr("id", blurId);
-    defs.append(blurClone);
-    
-    var filter = "url(#" + blurId + ")";
-    var move = "translateY(" + startingRange * Math.random() + "px)";
-    var styles = {
-      transform: move,
-      webkitFilter: filter,
-      filter: filter
-    };
-    $(this).css(styles).data("blur",blurClone);
-  });
-  
-  $('body').click(function() {
-    $(".text").toggleClass("expandLetterSpacing");
-    
-    $('.svgBlur span').each(function(i) {
-      var blurFilterX = "#blur" + (i + 1) + " feGaussianBlur";
-      randomDelay = Math.floor(1000*Math.random());
-      animateWithDelay($(this), randomDelay, $(blurFilterX));  
+  $(".section").each(function(i) {
+    $(this).find("span").each(function(j) {
+      var blurClone = blur.clone();
+      var blurId= (i + 1) + "blur" + (j + 1);
+      blurClone.attr("id", blurId);
+      defs.append(blurClone);
+      
+      var filter = "url(#" + blurId + ")";
+      var move = "translateY(" + startingRange * Math.random() + "px)";
+      var styles = {
+        transform: move,
+        webkitFilter: filter,
+        filter: filter
+      };
+      $(this).css(styles).data("blur",blurClone);
     });
   });
+  
+  $('.section1').click(function() {
+    animateTextWithinSection($(this));
+  });
+  $('.section2').click(function() {
+    animateTextWithinSection($(this));
+  });
 });
+
+function animateTextWithinSection(section) {
+  var sectionText = section.find(".text");
+  sectionText.toggleClass("expandLetterSpacing");
+
+  var sectionNumber = getSectionNumber(section);
+  var sectionLetters = sectionText.find("span");
+  sectionLetters.each(function(i) {
+    var blurFilterID = "#" + sectionNumber + "blur" + (i + 1) + " feGaussianBlur";
+    randomDelay = Math.floor(1000*Math.random());
+    animateWithDelay($(this), randomDelay, $(blurFilterID));
+  });
+}
 
 function animateBlur(element,filter) {
   var initalPos = parseFloat(element.css("transform").split(',')[5]);
@@ -75,4 +87,9 @@ function animateSection(section) {
     randomDelay = Math.floor(1000*Math.random());
     animateWithDelay($(this), randomDelay, $(blurFilterX));  
   });
+}
+
+function getSectionNumber(section) {
+  var stringifiedSection = section.attr("class");
+  return stringifiedSection.replace(/[^0-9]/g, '')
 }
